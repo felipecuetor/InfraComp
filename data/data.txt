@@ -1,0 +1,4 @@
+num_clientes=2000
+num_servidores=10
+consultas_cliente=150
+capacidad_buffer=50
