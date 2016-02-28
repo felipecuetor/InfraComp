@@ -20,6 +20,7 @@ import java.util.Properties;
 
 import Cliente.Cliente;
 import Cliente.Mensaje;
+import Servidor.Buffer;
 import Servidor.Servidor;
 
 
@@ -63,37 +64,37 @@ public class Main {
 		int consultas = Integer.parseInt(prop.getProperty("consultas_cliente"));
 		ArrayList<Cliente> clientes = new ArrayList<Cliente>();
 		ArrayList<Servidor> servidores = new ArrayList<Servidor>();
-		//Buffer buffer = new Buffer(Integer.parseInt(prop.getProperty("buffer.capacidad")));
+		Buffer buffer = new Buffer(Integer.parseInt(prop.getProperty("buffer.capacidad")));
 		boolean[] done={false};
 		
 		//Crea e inicia los servidores
-//		for (int i = 0; i < nServidores; i++)
-//		{
-//			Servidor nuevo = new Servidor(i, buffer,done);
-//			servidores.add(nuevo);
-//			nuevo.start();
-//		}
-//		
-//		//Crear e iniciar los clientes
-//		for(int i=0;i<noClientes;i++)
-//		{
-//			Cliente nuevo = new Cliente(mensajes, buffer, i);
-//			clientes.add(nuevo);
-//			nuevo.start();
-//		}
-//		//Espera a que los clientes terminen ejecucion
-//		while(clientes.size()>0)
-//			for (int i = 0; i < clientes.size(); i++)
-//				if(!clientes.get(i).estaActivo())
-//					clientes.remove(i);
-//		System.out.println("Todos los clientes han terminado sus consultas.\n");	
-//		done[0] = true;
-//		
-//		//Despertar los threads que estan dormidos en el buffer
-//		synchronized (buffer)
-//		{
-//			buffer.notifyAll();
-//		}
+		for (int i = 0; i < nServidores; i++)
+		{
+			Servidor nuevo = new Servidor(i, buffer,done);
+			servidores.add(nuevo);
+			nuevo.start();
+		}
+		
+		//Crear e iniciar los clientes
+		for(int i=0;i<noClientes;i++)
+		{
+			Cliente nuevo = new Cliente(mensajes, buffer, i);
+			clientes.add(nuevo);
+			nuevo.start();
+		}
+		//Espera a que los clientes terminen ejecucion
+		while(clientes.size()>0)
+			for (int i = 0; i < clientes.size(); i++)
+				if(!clientes.get(i).estaActivo())
+					clientes.remove(i);
+		System.out.println("Todos los clientes han terminado sus consultas.\n");	
+		done[0] = true;
+		
+		//Despertar los threads que estan dormidos en el buffer
+		synchronized (buffer)
+		{
+			buffer.notifyAll();
+		}
 		//Darle tiemp a los servidores que terminen
 		Thread.sleep(4000);
 		//Validar que los servidores hayan terminado su ejecuci—n
