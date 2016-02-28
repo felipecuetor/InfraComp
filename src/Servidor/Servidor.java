@@ -1,27 +1,40 @@
 package Servidor;
 
-public class Servidor {
-	
-	public boolean activo;
-	public int numero;
+import Cliente.Mensaje;
+
+public class Servidor extends Thread{
 	public Buffer buffer;
-	public boolean[] termino;
-	
 
-	public Servidor(int i, Buffer buffer, boolean[] done)
-	{
-		this.numero = i;
-		this.buffer =  buffer;
-		this.termino = done;
+	public boolean continuar;
+
+	public Servidor(Buffer buffer) {
+		this.buffer = buffer;
+		continuar = true;
 	}
 
-	public void start() {
+	public void run() {
+		while (buffer.getFin() != true) {
+			
+			procesar();
+		}
+	}
+
+	public void procesar() {
 		
-	}
+		Mensaje mensaje = buffer.atender();
 
-	public boolean estaActivo()
-	{
-		return activo;
+		if ()
+		{
+			System.out.println(mensaje);
+			continuar = false;
+		}
+		else {
+			
+			int consulta = mensaje.getConsulta();
+			mensaje.setRespuesta(consulta++);
+			mensaje.notificar();
+			
+		}
 	}
 
 }

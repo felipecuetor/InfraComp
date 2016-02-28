@@ -4,26 +4,44 @@ import java.util.ArrayList;
 
 import Servidor.Buffer;
 
-public class Cliente {
-	
-	public boolean activo;
-	public ArrayList<Mensaje> mensajes;
+public class Cliente extends Thread {
+
 	public Buffer buffer;
-	public int numero;
+	public int numeroConsultas;
+	private boolean fallo;
 
-	public Cliente(ArrayList<Mensaje> mensajes, Buffer buffer, int i)
-	{
-		this.mensajes = mensajes;
+	public Cliente(Buffer buffer, int numeroConsultas) {
+
+		this.numeroConsultas = numeroConsultas;
 		this.buffer = buffer;
-		this.numero = i;
+		this.fallo = false;
 	}
 
-	public void start() {
+	public void run() {
+		while (numeroConsultas > 0) {
+
+			consultar();
+		}
+		System.out.println(fallo);
+		buffer.clienteTermino();
+	}
+
+	public void consultar() {
+		numeroConsultas--;
+		Mensaje mensaje = new Mensaje(numeroConsultas);
 		
-	}
+		while (!buffer.recibirMensaje(mensaje))
+			yield();
+		
+		
+		mensaje.setConsulta(numeroConsultas);
+		
+		
+		mensaje.eperar();
+		
 
-	public boolean estaActivo() {
-		return activo;
+		if (!(mensaje.getConsulta() + 1 == mensaje.getRespuesta()))
+			fallo = true;
 	}
 
 }

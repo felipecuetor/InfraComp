@@ -1,17 +1,40 @@
 package Servidor;
 
 import java.util.ArrayList;
-import java.util.Queue;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.concurrent.BlockingQueue;
 
 import Cliente.Mensaje;
 
 public class Buffer {
-	private Queue<Mensaje> porProcesar;
+	private LinkedList<Mensaje> porProcesar;
 	
 	private int capacidad;
 	
 	private int contador;
 	
+	private int clientes;
+	
+	private boolean fin;
+	
+	/**
+	 * Crea un nuevo buffer a partir de una capacidad maxima y una cantidad especifica de clientes
+	 * @param capacidad
+	 */
+	public Buffer(int capacidad, int clientes) {
+		porProcesar= new LinkedList();
+		this.capacidad=capacidad;
+		this.clientes = clientes;
+		this.fin=false;
+	}
+	
+	/**
+	 * Recibe un mensaje de un cliente
+	 * @param mensaje un mensaje de un cliente
+	 * @return return falso si no se logro agregar, y verdadero si si
+	 */
 	public synchronized boolean recibirMensaje(Mensaje mensaje)
 	{
 		if(contador == capacidad)
@@ -22,10 +45,19 @@ public class Buffer {
 		return true;
 	}
 	
+	/**
+	 * metodo por donde atienden los servidores a los mensajes de los clientes
+	 * @return retorna el mensaje por procesar
+	 */
 	public synchronized Mensaje atender()
 	{
+		
 		if(contador == 0)
 		{
+			if(clientes == 0){
+				System.out.println("procesando");
+				return null;
+			}
 			try {
 				wait();
 			} catch (InterruptedException e) {
@@ -33,12 +65,25 @@ public class Buffer {
 			}
 		}
 		
-		return porProcesar.poll();
+		Mensaje mensaje = porProcesar.poll();
+		contador--;
+		return mensaje;
 		
 	}
-
-	public Buffer(int parseInt) {
-		// TODO Auto-generated constructor stub
+	
+	public void clienteTermino()
+	{
+		
+		clientes--;
+		
+		if(clientes == 0)
+		{
+			fin = true;
+			notifyAll();
+		}
 	}
 
+	public boolean getFin() {
+		return fin;
+	}
 }

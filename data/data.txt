@@ -1,4 +1,8 @@
-num_clientes=2000
-num_servidores=10
-consultas_cliente=150
-capacidad_buffer=50
+numeroClientes
+10
+numeroServidores
+5
+numeroConsultas
+100000000
+capacidadBuffer
+5
