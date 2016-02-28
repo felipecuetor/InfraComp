@@ -1,3 +1,15 @@
+/**
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * Universidad de los Andes (Bogotá - Colombia)
+ * Departamento de Ingeniería de Sistemas y Computación 
+ *
+ * Proyecto Caso1
+ * Infraestructura Computacional
+ * Autor: Felipe Cueto  - Marzo 1, 2016
+ * Autor: Paula Ramirez - Marzo 1, 2016
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ */
+
 package Servidor;
 
 import java.util.ArrayList;
@@ -9,15 +21,39 @@ import java.util.concurrent.BlockingQueue;
 import Cliente.Mensaje;
 
 public class Buffer {
+	
+	// -----------------------------------------------------------------
+    // ATRIBUTOS
+    // -----------------------------------------------------------------
+	
+	/**
+	 * Lista de mensajes que debe procesar
+	 */
 	private LinkedList<Mensaje> porProcesar;
 	
+	/**
+	 * Capacidad del buffer
+	 */
 	private int capacidad;
 	
+	/**
+	 * Espacios libres que tiene el buffer
+	 */
 	private int contador;
 	
+	/**
+	 * Numero de clientes que estan interactuando con el buffer
+	 */
 	private int clientes;
 	
+	/**
+	 * Indica el fin del buffer
+	 */
 	private boolean fin;
+	
+	// -----------------------------------------------------------------
+    // CONSTRUCTOR
+    // -----------------------------------------------------------------
 	
 	/**
 	 * Crea un nuevo buffer a partir de una capacidad maxima y una cantidad especifica de clientes
@@ -29,6 +65,10 @@ public class Buffer {
 		this.clientes = clientes;
 		this.fin=false;
 	}
+	
+	// -----------------------------------------------------------------
+    // 
+    // -----------------------------------------------------------------
 	
 	/**
 	 * Recibe un mensaje de un cliente
@@ -71,6 +111,9 @@ public class Buffer {
 		
 	}
 	
+	/**
+	 * Reduce el numero de clientes que estan en el buffer en el momento en el que terminan
+	 */
 	public void clienteTermino()
 	{
 		
