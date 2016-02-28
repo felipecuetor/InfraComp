@@ -1,3 +1,15 @@
+/**
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * Universidad de los Andes (Bogotá - Colombia)
+ * Departamento de Ingeniería de Sistemas y Computación 
+ *
+ * Proyecto Caso1
+ * Infraestructura Computacional
+ * Autor: Felipe Cueto  - Marzo 1, 2016
+ * Autor: Paula Ramirez - Marzo 1, 2016
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ */
+
 package Servidor;
 
 import java.util.ArrayList;
@@ -9,6 +21,10 @@ import java.util.concurrent.BlockingQueue;
 import Cliente.Mensaje;
 
 public class Buffer {
+	
+	// -----------------------------------------------------------------
+    // ATRIBUTOS
+    // -----------------------------------------------------------------
 	private LinkedList<Mensaje> porProcesar;
 	
 	private int capacidad;
@@ -18,6 +34,10 @@ public class Buffer {
 	private int clientes;
 	
 	private boolean fin;
+	
+	// -----------------------------------------------------------------
+    // CONSTRUCTOR
+    // -----------------------------------------------------------------
 	
 	/**
 	 * Crea un nuevo buffer a partir de una capacidad maxima y una cantidad especifica de clientes
@@ -29,6 +49,10 @@ public class Buffer {
 		this.clientes = clientes;
 		this.fin=false;
 	}
+	
+	// -----------------------------------------------------------------
+    // METODOS
+    // -----------------------------------------------------------------
 	
 	/**
 	 * Recibe un mensaje de un cliente

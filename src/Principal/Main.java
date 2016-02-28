@@ -26,6 +26,9 @@ import Servidor.Buffer;
 import Servidor.Servidor;
 
 public class Main {
+	
+	public static int clientesTerminan;
+	
 	public static void main(String[] args) throws Exception {		
 		File data = new File("./data/data.txt");
 
@@ -50,8 +53,15 @@ public class Main {
 		for (int i = 0; i < numeroClientes; i++) {
 
 			(new Cliente(buffer, numeroConsultas)).start();
+			(new Cliente(buffer, numeroConsultas)).activar();
 		}
 
+	}
+	
+	public synchronized static void clientesTerminan()
+	{
+		clientesTerminan ++;
+		System.out.println("han terminado "+ clientesTerminan +" clientes." );
 	}
 
 }

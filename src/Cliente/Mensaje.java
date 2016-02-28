@@ -1,15 +1,39 @@
+/**
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * Universidad de los Andes (Bogotá - Colombia)
+ * Departamento de Ingeniería de Sistemas y Computación 
+ *
+ * Proyecto Caso1
+ * Infraestructura Computacional
+ * Autor: Felipe Cueto  - Marzo 1, 2016
+ * Autor: Paula Ramirez - Marzo 1, 2016
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ */
+
 package Cliente;
 
 public class Mensaje {
+	
+	// -----------------------------------------------------------------
+    // ATRIBUTOS
+    // -----------------------------------------------------------------
 
 	private int consulta;
 
 	private int respuesta;
+	
+	// -----------------------------------------------------------------
+    // CONSTRUCTOR
+    // -----------------------------------------------------------------
 
 	public Mensaje(int consulta) {
 		this.consulta = consulta;
-		this.respuesta = respuesta;
+		this.respuesta = 0;
 	}
+	
+	// -----------------------------------------------------------------
+    // METODOS
+    // -----------------------------------------------------------------
 
 	public int getConsulta() {
 		return consulta;
