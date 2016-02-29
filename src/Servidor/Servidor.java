@@ -1,83 +1,39 @@
-/**
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- * Universidad de los Andes (Bogotá - Colombia)
- * Departamento de Ingeniería de Sistemas y Computación 
- *
- * Proyecto Caso1
- * Infraestructura Computacional
- * Autor: Felipe Cueto  - Marzo 1, 2016
- * Autor: Paula Ramirez - Marzo 1, 2016
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- */
-
 package Servidor;
 
 import Cliente.Mensaje;
 
-public class Servidor extends Thread{
-	
-	// -----------------------------------------------------------------
-    // ATRIBUTOS
-    // -----------------------------------------------------------------
-	
-	/**
-	 * Buffer por el cual se va a comunicar
-	 */
+public class Servidor extends Thread {
 	public Buffer buffer;
-	
-	/**
-	 * Indica si debe continuar 
-	 */
-	public boolean continuar;
-	
-	// -----------------------------------------------------------------
-    // CONSTRUCTOR
-    // -----------------------------------------------------------------
 
-	 /**
-     * Construye un nuevo Servidor que va a atender un Buffer.
-     * @param buffer El buffer de comunicacion
-     */
+	public boolean continuar;
+
 	public Servidor(Buffer buffer) {
 		this.buffer = buffer;
 		continuar = true;
 	}
-	
-	// -----------------------------------------------------------------
-    // 
-    // -----------------------------------------------------------------
 
-	/**
-	 * Se comienza la interaccion del servidor
-     */
 	public void run() {
-		while (buffer.getFin() != true) {
-			
+		while (continuar) {
 			procesar();
 		}
+		System.out.println("Servidor termino");
 	}
 
-	/**
-     * Metodo encargado de procesar el mensaje.
-     * Pre: El mensaje tiene una consulta adingada.
-     * Post: El mensaje fue procesado, la respuesta fue asignada.
-     * 				 - Se despierta a quien este esperando la respuesta. 
-     */
 	public void procesar() {
-		
+
 		Mensaje mensaje = buffer.atender();
 
-		if (continuar == true)
-		{
-			System.out.println(mensaje);
-			continuar = false;
-		}
-		else {
-			
+		while (mensaje == null && continuar) {
+			if (buffer.getFin())
+				continuar = false;
+
+			mensaje = buffer.atender();
+			yield();
+		}  
+		if (continuar) {
 			int consulta = mensaje.getConsulta();
 			mensaje.setRespuesta(consulta++);
 			mensaje.notificar();
-			
 		}
 	}
 

@@ -1,8 +1,8 @@
 numeroClientes
 10
 numeroServidores
-5
+3
 numeroConsultas
-100000000
+2
 capacidadBuffer
 5
