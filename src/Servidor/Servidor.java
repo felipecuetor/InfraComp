@@ -42,7 +42,7 @@ public class Servidor extends Thread {
 		}  
 		if (continuar) {
 			int consulta = mensaje.getConsulta();
-			mensaje.setRespuesta(consulta++);
+			mensaje.setRespuesta(consulta+1);
 			mensaje.notificar();
 		}
 	}

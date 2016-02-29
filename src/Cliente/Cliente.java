@@ -31,7 +31,7 @@ public class Cliente extends Thread {
 		while (numeroConsultas > 0) {
 			consultar();
 		}
-		System.out.println(fallo);
+		System.out.println("¿Hubo error en el cliente? "+fallo);
 		buffer.clienteTermino();
 	}
 
@@ -56,7 +56,10 @@ public class Cliente extends Thread {
 		
 
 		if (!(mensaje.getConsulta() + 1 == mensaje.getRespuesta()))
+		{
+			System.out.println(mensaje.getConsulta()+"-"+mensaje.getRespuesta());
 			fallo = true;
+		}
 	}
 
 }
