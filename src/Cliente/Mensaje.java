@@ -6,6 +6,10 @@ public class Mensaje {
 
 	private int respuesta;
 
+	/**
+	 * Crea un nuevo mensaje
+	 * @param consulta el valor a consultar
+	 */
 	public Mensaje(int consulta) {
 		this.consulta = consulta;
 		this.respuesta = respuesta;
@@ -27,6 +31,9 @@ public class Mensaje {
 		this.respuesta = respuesta;
 	}
 
+	/**
+	 * Duerme el thread que lo active
+	 */
 	public synchronized void eperar() {
 		
 		try {
@@ -36,6 +43,9 @@ public class Mensaje {
 		}
 	}
 	
+	/**
+	 * Notifica el thread que esta en este mensaje
+	 */
 	public synchronized void notificar()
 	{
 		notify();

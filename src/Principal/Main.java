@@ -25,6 +25,12 @@ import Cliente.Mensaje;
 import Servidor.Buffer;
 import Servidor.Servidor;
 
+/**
+ * Inicializa el programa, saca de un documento externo la cantidad de clientes, servidores, consultas y la capacidad del buffer
+ * Crea el buffer y los threads necesarios
+ * @author fcr
+ *
+ */
 public class Main {
 	public static void main(String[] args) throws Exception {		
 		File data = new File("./data/data.txt");

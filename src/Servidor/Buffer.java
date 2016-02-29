@@ -62,6 +62,10 @@ public class Buffer {
 		
 	}
 	
+	/**
+	 * El cliente le avisa al buffer que termino
+	 * Se reduce la cantidad de clientes activos
+	 */
 	public synchronized void clienteTermino()
 	{
 		clientes--;
@@ -72,6 +76,10 @@ public class Buffer {
 		}
 	}
 
+	/**
+	 * Dice si se terminaron los clientes por atender
+	 * @return true si no hay clientes, false si hay
+	 */
 	public synchronized boolean getFin() {
 		return (clientes == 0);
 
