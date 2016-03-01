@@ -71,10 +71,6 @@ public class Buffer {
 		clientes--;
 		System.out.println("Clientes activos: "+clientes);
 		
-		if(clientes == 0)
-		{
-			notifyAll();
-		}
 	}
 
 	/**
