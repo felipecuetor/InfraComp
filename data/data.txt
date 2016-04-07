@@ -1,8 +1,0 @@
-numeroClientes
-10
-numeroServidores
-3
-numeroConsultas
-2
-capacidadBuffer
-5
