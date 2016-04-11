@@ -9,14 +9,24 @@ import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.net.Socket;
 import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Random;
 
+import javax.crypto.SecretKey;
 import javax.security.auth.x500.X500Principal;
 
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x509.*;
+import org.bouncycastle.crypto.util.PrivateKeyFactory;
+import org.bouncycastle.x509.X509V3CertificateGenerator;
+import org.bouncycastle.x509.extension.AuthorityKeyIdentifierStructure;
+import org.bouncycastle.x509.extension.SubjectKeyIdentifierStructure;
 
 import Principal.CifradorAsimetrico;
 import Principal.CifradorSimetrico;
@@ -33,8 +43,14 @@ public class Cliente {
 	public CifradorSimetrico cSimetrico;
 	public CifradorAsimetrico cAsimetrico;
 
+	private PublicKey publicKey;
+	private PrivateKey privateKey;
+
 	public Cliente(Socket socketCliente) {
 		this.socket = socketCliente;
+
+		PrivateKeyFactory factory = new PrivateKeyFactory();
+
 		try {
 			generarConexion();
 
@@ -94,34 +110,30 @@ public class Cliente {
 
 	}
 
-	private java.security.cert.X509Certificate certificado() {
+	private X509Certificate certificado() {
 		
-//		Calendar cal = Calendar.getInstance();
+//		Date startDate = Calendar.getInstance().getTime();
+//		int year = startDate.getDate();
+//		startDate.setYear(year+5);
+//		Date expiryDate = startDate;
+//		BigInteger serialNumber = new BigInteger(1024, new Random());
+//		PrivateKey caKey = ;
+//		X509Certificate nombreExpedidor = new X509Certificate();
 //		
-//		Date startDate = cal.getTime();                // time from which certificate is valid
-//		Date expiryDate = cal.getTime();               // time after which certificate is not valid
-//		BigInteger serialNumber = null;       // serial number for certificate
-//		PrivateKey caKey = null;              // private key of the certifying authority (ca) certificate
-//		X509Certificate caCert = null;        // public key certificate of the certifying authority
-//		KeyPair keyPair = null;               // public/private key pair that we are creating certificate for
+//		KeyPair keyPair = (new KeyPairGenerator("RAS")).generateKeyPair();
 //		X509V3CertificateGenerator certGen = new X509V3CertificateGenerator();
-//		X509Name subjectName = new X509Name("CN=Test V3 Certificate");
-//		 
+//		X500Principal subjectName = new X500Principal("CN=Test V3 Certificate");
+//		String signatureAlgorithm = "";
+//		
+//		
 //		certGen.setSerialNumber(serialNumber);
-//		certGen.setIssuerDN(null);
+//		certGen.setIssuerDN(nombreExpedidor);//caCert.getSubjectX500Principal());
 //		certGen.setNotBefore(startDate);
 //		certGen.setNotAfter(expiryDate);
 //		certGen.setSubjectDN(subjectName);
 //		certGen.setPublicKey(keyPair.getPublic());
 //		certGen.setSignatureAlgorithm(signatureAlgorithm);
-//		certGen.addExtension(X509Extensions.AuthorityKeyIdentifier, false,
-//		                        new AuthorityKeyIdentifierStructure(caCert));
-//		certGen.addExtension(X509Extensions.SubjectKeyIdentifier, false,
-//		                        new SubjectKeyIdentifierStructure(keyPair.getPublic());
-//		 
-//		java.security.cert.X509Certificate cert = certGen.generate(caKey, "BC");   // note: private key of CA
-//		
-//		return cert;
+		
 		return null;
 	}
 
@@ -129,13 +141,29 @@ public class Cliente {
 		out.println("CERTCLNT:");
 
 		try {
-			java.security.cert.X509Certificate cert = certificado();
+			X509Certificate cert = certificado();
 			byte[] mybyte = cert.getEncoded();
 			outByte.write(mybyte);
 			outByte.flush();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		String entrada;
+		try {
+			entrada = in.readLine();
+			System.out.println(entrada);
+			
+			
+			byte[] certificado= new byte[100];
+			inByte.read(certificado);
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
 
 	}
 
