@@ -1,6 +1,7 @@
 package Cliente;
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -10,6 +11,7 @@ import java.math.BigInteger;
 import java.net.Socket;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
@@ -24,12 +26,15 @@ import javax.security.auth.x500.X500Principal;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.crypto.util.PrivateKeyFactory;
+import org.bouncycastle.jce.PKCS10CertificationRequest;
+import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
 import org.bouncycastle.x509.extension.AuthorityKeyIdentifierStructure;
 import org.bouncycastle.x509.extension.SubjectKeyIdentifierStructure;
 
 import Principal.CifradorAsimetrico;
 import Principal.CifradorSimetrico;
+import Principal.Transformacion;
 
 public class Cliente {
 
@@ -46,6 +51,13 @@ public class Cliente {
 	private PublicKey publicKey;
 	private PrivateKey privateKey;
 
+	/**
+	 * Main encargado de inicializar valores y de manejar la comunicacion con el
+	 * servidor
+	 * 
+	 * @param socketCliente
+	 *            el socket de comunicacion con el servidor
+	 */
 	public Cliente(Socket socketCliente) {
 		this.socket = socketCliente;
 
@@ -59,11 +71,19 @@ public class Cliente {
 			intercambioAlgoritmos();
 
 			intercambioCertificados();
+
+			intercambioLlaveSimetrica();
+
+			envioPosicion();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
+	/**
+	 * Genera una entrada y una salida de String Genera una entrada y una salida
+	 * de bytes
+	 */
 	public void generarConexion() {
 		try {
 			out = new PrintWriter(socket.getOutputStream(), true);
@@ -76,17 +96,32 @@ public class Cliente {
 		}
 	}
 
-	private void inicializacion() {
+	/**
+	 * Inicializa comunicacion con el servidor y verifica su respuesta
+	 * 
+	 * @throws Exception
+	 *             lanza excepcion cuando la respuesta es incorrecta
+	 */
+	private void inicializacion() throws Exception {
 		out.println("HOLA");
 
 		try {
 			String entrada = in.readLine();
 			System.out.println(entrada);
+
+			if (!entrada.equals("INICIO"))
+				throw new Exception("Respuesta incorrecta");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
+	/**
+	 * Se encarga de enviar los algoritmos de comunicacion
+	 * 
+	 * @throws Exception
+	 *             lanza excepcion cuando se retorna un mensaje de error
+	 */
 	private void intercambioAlgoritmos() throws Exception {
 		out.print("ALGORITMOS");
 		out.print(":");
@@ -110,35 +145,59 @@ public class Cliente {
 
 	}
 
+	/**
+	 * Genera el certificado de el cliente
+	 * 
+	 * @return el certificado del cliente
+	 */
+	@SuppressWarnings("deprecation")
 	private X509Certificate certificado() {
-		
-//		Date startDate = Calendar.getInstance().getTime();
-//		int year = startDate.getDate();
-//		startDate.setYear(year+5);
-//		Date expiryDate = startDate;
-//		BigInteger serialNumber = new BigInteger(1024, new Random());
-//		PrivateKey caKey = ;
-//		X509Certificate nombreExpedidor = new X509Certificate();
-//		
-//		KeyPair keyPair = (new KeyPairGenerator("RAS")).generateKeyPair();
-//		X509V3CertificateGenerator certGen = new X509V3CertificateGenerator();
-//		X500Principal subjectName = new X500Principal("CN=Test V3 Certificate");
-//		String signatureAlgorithm = "";
-//		
-//		
-//		certGen.setSerialNumber(serialNumber);
-//		certGen.setIssuerDN(nombreExpedidor);//caCert.getSubjectX500Principal());
-//		certGen.setNotBefore(startDate);
-//		certGen.setNotAfter(expiryDate);
-//		certGen.setSubjectDN(subjectName);
-//		certGen.setPublicKey(keyPair.getPublic());
-//		certGen.setSignatureAlgorithm(signatureAlgorithm);
-		
+
+		Date startDate = Calendar.getInstance().getTime();
+		int year = startDate.getYear();
+		startDate.setYear(year + 5);
+		Date expiryDate = startDate;
+		BigInteger serialNumber = new BigInteger(256, new Random());
+
+		KeyPairGenerator gen;
+		KeyPair keyPair = null;
+		try {
+			gen = KeyPairGenerator.getInstance("RSA");
+			gen.initialize(1024, new SecureRandom());
+			keyPair = (gen.generateKeyPair());
+
+			publicKey = keyPair.getPublic();
+			privateKey = keyPair.getPrivate();
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+
+		X509V3CertificateGenerator certGen = new X509V3CertificateGenerator();
+		X500Principal subjectName = new X500Principal("CN=Test V3 Certificate");
+
+		certGen.setSerialNumber(serialNumber);
+		certGen.setIssuerDN(subjectName);// caCert.getSubjectX500Principal());
+		certGen.setNotBefore(startDate);
+		certGen.setNotAfter(expiryDate);
+		certGen.setSubjectDN(subjectName);
+		certGen.setPublicKey(keyPair.getPublic());
+		certGen.setSignatureAlgorithm("SHA224withRSA");
+
+		try {
+			return certGen.generate(keyPair.getPrivate());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		return null;
 	}
 
+	/**
+	 * Se encarga de enviar el certificado del cliente y de recibir el
+	 * certificado del servidor
+	 */
 	private void intercambioCertificados() {
-		out.println("CERTCLNT:");
+		out.println("CERCLNT:");
 
 		try {
 			X509Certificate cert = certificado();
@@ -148,22 +207,31 @@ public class Cliente {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		String entrada;
 		try {
+
 			entrada = in.readLine();
 			System.out.println(entrada);
-			
-			
-			byte[] certificado= new byte[100];
+
+			byte[] certificado = new byte[100];
 			inByte.read(certificado);
+			System.out.println(certificado);
+
+			PKCS10CertificationRequest kpGen = new PKCS10CertificationRequest(certificado);
+			System.out.println(kpGen);
 			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-		
+	}
+
+	private void intercambioLlaveSimetrica() {
+
+	}
+
+	private void envioPosicion() {
 
 	}
 
