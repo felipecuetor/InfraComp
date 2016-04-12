@@ -1,6 +1,7 @@
 package Cliente;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,12 +16,14 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
 
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
@@ -40,16 +43,18 @@ public class Cliente {
 
 	private PrintWriter out;
 	private BufferedReader in;
-
 	private OutputStream outByte;
 	private InputStream inByte;
 
 	public Socket socket;
-	public CifradorSimetrico cSimetrico;
-	public CifradorAsimetrico cAsimetrico;
 
 	private PublicKey publicKey;
 	private PrivateKey privateKey;
+
+	private PublicKey publicKeySer;
+
+	private CifradorAsimetrico asim;
+	private CifradorSimetrico sim;
 
 	/**
 	 * Main encargado de inicializar valores y de manejar la comunicacion con el
@@ -70,10 +75,13 @@ public class Cliente {
 
 			intercambioAlgoritmos();
 
+			System.out.println("certificados:----------------------------");
 			intercambioCertificados();
 
+			System.out.println("llaves:----------------------------");
 			intercambioLlaveSimetrica();
 
+			System.out.println("posicion:----------------------------");
 			envioPosicion();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -168,6 +176,8 @@ public class Cliente {
 
 			publicKey = keyPair.getPublic();
 			privateKey = keyPair.getPrivate();
+
+			asim = new CifradorAsimetrico(keyPair);
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		}
@@ -214,20 +224,45 @@ public class Cliente {
 			entrada = in.readLine();
 			System.out.println(entrada);
 
-			byte[] certificado = new byte[100];
+			byte[] certificado = new byte[1024];
 			inByte.read(certificado);
 			System.out.println(certificado);
 
-			PKCS10CertificationRequest kpGen = new PKCS10CertificationRequest(certificado);
-			System.out.println(kpGen);
+			X509Certificate certSer = (X509Certificate) CertificateFactory.getInstance("X.509")
+					.generateCertificate(new ByteArrayInputStream(certificado));
+			publicKeySer = certSer.getPublicKey();
+			certSer.verify(publicKeySer);
+			System.out.println(certSer.toString());
 			
+			out.println("ESTADO:OK");
 
 		} catch (Exception e) {
 			e.printStackTrace();
+			out.println("ESTADO:ERROR");
 		}
 	}
 
 	private void intercambioLlaveSimetrica() {
+
+		try {
+			String entrada = in.readLine();
+			System.out.println(entrada);
+
+			String[] div = entrada.split(":");
+
+			String des = asim.descifrar(new Transformacion().destransformar(div[1]));
+
+			SecretKey deskey = new SecretKeySpec(des.getBytes(), "RSA");
+
+			sim = new CifradorSimetrico(deskey);
+
+			String cif = asim.cifrarPublic(des, publicKeySer).toString();
+
+			out.println("DATA:" + new Transformacion().transformar(cif.getBytes()));
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 	}
 
