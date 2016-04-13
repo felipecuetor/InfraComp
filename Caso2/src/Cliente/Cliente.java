@@ -37,6 +37,7 @@ import org.bouncycastle.x509.extension.SubjectKeyIdentifierStructure;
 
 import Principal.CifradorAsimetrico;
 import Principal.CifradorSimetrico;
+import Principal.Hash;
 import Principal.Transformacion;
 
 public class Cliente {
@@ -233,7 +234,7 @@ public class Cliente {
 			publicKeySer = certSer.getPublicKey();
 			certSer.verify(publicKeySer);
 			System.out.println(certSer.toString());
-			
+
 			out.println("ESTADO:OK");
 
 		} catch (Exception e) {
@@ -242,7 +243,7 @@ public class Cliente {
 		}
 	}
 
-	private void intercambioLlaveSimetrica() {
+	private void intercambioLlaveSimetrica() throws Exception {
 
 		try {
 			String entrada = in.readLine();
@@ -256,9 +257,16 @@ public class Cliente {
 
 			sim = new CifradorSimetrico(deskey);
 
-			String cif = asim.cifrarPublic(des, publicKeySer).toString();
+			byte[] cif = asim.cifrarPublic(des, publicKeySer);
 
-			out.println("DATA:" + new Transformacion().transformar(cif.getBytes()));
+			out.println("DATA:" + new Transformacion().transformar(cif));
+
+			String resp = in.readLine();
+			System.out.println(resp);
+
+			String[] split = resp.split(":");
+			if (split[1].equals("ERROR"))
+				throw new Exception("No se sincronizaron las llaves");
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -267,7 +275,19 @@ public class Cliente {
 	}
 
 	private void envioPosicion() {
+		String resp;
+		try {
+			String pos = "4124.2028,210.4418";
+			out.println(sim.cifrar(pos));
+			out.println(sim.cifrar(new Transformacion().transformar(new Hash().calcular(pos))));
 
+			resp = in.readLine();
+
+			System.out.println(resp);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }
