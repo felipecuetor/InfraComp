@@ -277,7 +277,7 @@ public class Cliente {
 	private void envioPosicion() {
 		String resp;
 		try {
-			String pos = "4124.2028,210.4418";
+			String pos = "1,1";
 			out.println(sim.cifrar(pos));
 			out.println(sim.cifrar(new Transformacion().transformar(new Hash().calcular(pos))));
 
