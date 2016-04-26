@@ -7,6 +7,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.KeyPair;
 import java.security.Security;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Coordinador {
 
@@ -14,6 +16,7 @@ public class Coordinador {
 	private static final String MAESTRO = "MAESTRO: ";
 	static java.security.cert.X509Certificate certSer; /* acceso default */
 	static KeyPair keyPairServidor; /* acceso default */
+	static int MAX=5;
 	
 	/**
 	 * @param args
@@ -37,14 +40,20 @@ public class Coordinador {
 		
 		keyPairServidor = S.grsa();
 		certSer = S.gc(keyPairServidor);
+		
+		ExecutorService fixedPool = Executors.newFixedThreadPool(MAX);
+		
 		while (true) {
 			try { 
-				// Crea un delegado por cliente. Atiende por conexion. 
+				// Crea un delegado por cliente. Atiende por conexion.
+				System.out.println("Esperando");
 				Socket sc = ss.accept();
 				System.out.println(MAESTRO + "Cliente " + idThread + " aceptado.");
 				Delegado d = new Delegado(sc,idThread);
 				idThread++;
-				d.start();
+				fixedPool.submit(d);
+				
+//				d.start();
 			} catch (IOException e) {
 				System.out.println(MAESTRO + "Error creando el socket cliente.");
 				e.printStackTrace();
