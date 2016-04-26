@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.net.Socket;
+import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -35,12 +36,15 @@ import org.bouncycastle.x509.X509V3CertificateGenerator;
 import org.bouncycastle.x509.extension.AuthorityKeyIdentifierStructure;
 import org.bouncycastle.x509.extension.SubjectKeyIdentifierStructure;
 
+import Principal.Cifrado;
 import Principal.CifradorAsimetrico;
 import Principal.CifradorSimetrico;
 import Principal.Hash;
 import Principal.Transformacion;
 
 public class Cliente {
+
+	private final static String PADDING = "/ECB/PKCS5Padding";
 
 	private PrintWriter out;
 	private BufferedReader in;
@@ -56,6 +60,8 @@ public class Cliente {
 
 	private CifradorAsimetrico asim;
 	private CifradorSimetrico sim;
+
+	private Key llaveSim;
 
 	/**
 	 * Main encargado de inicializar valores y de manejar la comunicacion con el
@@ -253,7 +259,9 @@ public class Cliente {
 
 			String des = asim.descifrar(new Transformacion().destransformar(div[1]));
 
-			SecretKey deskey = new SecretKeySpec(des.getBytes(), "RSA");
+			SecretKey deskey = new SecretKeySpec(des.getBytes(), "DES");
+
+			llaveSim = deskey;
 
 			sim = new CifradorSimetrico(deskey);
 
@@ -277,17 +285,36 @@ public class Cliente {
 	private void envioPosicion() {
 		String resp;
 		try {
-			String pos = "1,1";
-			out.println(sim.cifrar(pos));
-			out.println(sim.cifrar(new Transformacion().transformar(new Hash().calcular(pos))));
+			String posicion = "4124.2028,210.4418";
+			// Cifrar los datos
+			byte[] cipher = Cifrado.cifrar(posicion.getBytes(), llaveSim, "DES" + PADDING);
 
-			resp = in.readLine();
+			System.out.println(encapsular(cipher));
 
-			System.out.println(resp);
-		} catch (IOException e) {
+			// Enviar datos cifrados
+			out.println("ACT1:" + encapsular(cipher));
+
+			// Calcular el Hash
+			// Calcular el MAC
+			byte[] mac = Cifrado.calcularMAC(posicion.getBytes(), llaveSim, "HMACSHA1");
+
+			// Enviar MAC
+			out.println(
+					"ACT2:" + new Transformacion().transformar(Cifrado.cifrar(mac, privateKey, "RSA")));
+
+			String linea = in.readLine();
+			System.out.println(linea);
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	private String encapsular(byte[] data) {
+		String rta = "";
+		for (byte b : data)
+			rta += String.format("%2s", Integer.toHexString((char) b & 0xFF)).replace(' ', '0');
+		return rta;
 	}
 
 }

@@ -1,44 +1,41 @@
 package Principal;
 
+import java.security.Key;
+
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
 public class CifradorSimetrico {
 
-	private SecretKey desKey;
-	private final static String ALGORITMO = "AES";
-	private final static String PADDING = "AES/ECB/PKCS5Padding";
-	
-	public CifradorSimetrico(SecretKey deskey)
-	{
-		this.desKey=deskey;
+	private Key desKey;
+	private final static String ALGORITMO = "RC4";
+	private final static String PADDING = "RC4";
+
+	public CifradorSimetrico(Key deskey) {
+		this.desKey = deskey;
 	}
 
 	public byte[] cifrar(String men) {
-		
+
 		byte[] cipheredText;
 		try {
-			KeyGenerator keygen = KeyGenerator.getInstance(ALGORITMO);
-			desKey = keygen.generateKey();
 			Cipher cipher = Cipher.getInstance(PADDING);
 			String pwd = men;
-			byte[] clearText = pwd.getBytes();
-			String s1 = new String(clearText);
-			System.out.println("	clave original: " + s1);
+			byte[] clearText = (new Transformacion().destransformar(men));
+
 			cipher.init(Cipher.ENCRYPT_MODE, desKey);
 
 			long startTime = System.nanoTime();
 			cipheredText = cipher.doFinal(clearText);
 
 			long endTime = System.nanoTime();
-			String s2 = new String(cipheredText);
-			System.out.println("	clave cifrada: " + s2);
-			System.out.println("	Tiempo: " + (endTime - startTime));
 
+			System.out.println("LLEGO");
+			System.out.println(cipheredText);
 			return cipheredText;
 		} catch (Exception e) {
-			System.out.println("	Excepcion: " + e.getMessage());
+			e.printStackTrace();
 			return null;
 		}
 	}
@@ -50,7 +47,7 @@ public class CifradorSimetrico {
 			byte[] clearText = cipher.doFinal(cipheredText);
 			String s3 = new String(clearText);
 			System.out.println("	clave original: " + s3);
-			
+
 			return s3;
 		} catch (Exception e) {
 			System.out.println("	Excepcion: " + e.getMessage());

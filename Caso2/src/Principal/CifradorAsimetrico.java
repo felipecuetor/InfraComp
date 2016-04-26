@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 
 import javax.crypto.Cipher;
@@ -20,7 +21,7 @@ public class CifradorAsimetrico {
 
 	public byte[] cifrar(String dat) {
 		try {
-			
+
 			KeyPairGenerator generator = KeyPairGenerator.getInstance(ALGORITMO);
 			generator.initialize(1024);
 			keyPair = generator.generateKeyPair();
@@ -61,16 +62,13 @@ public class CifradorAsimetrico {
 		try {
 			KeyPairGenerator generator = KeyPairGenerator.getInstance(ALGORITMO);
 			generator.initialize(1024);
-			keyPair = generator.generateKeyPair();
 			Cipher cipher = Cipher.getInstance(ALGORITMO);
 
 			String pwd = data;
 			byte[] clearText = pwd.getBytes();
 			String s1 = new String(clearText);
 			cipher.init(Cipher.ENCRYPT_MODE, llave);
-			long startTime = System.nanoTime();
 			byte[] cipheredText = cipher.doFinal(clearText);
-
 			return cipheredText;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -86,4 +84,20 @@ public class CifradorAsimetrico {
 		this.keyPair = keyPair;
 	}
 
+	public byte[] cifrarPrivate(String string, PrivateKey llave) {
+		try {
+			Cipher cipher = Cipher.getInstance(ALGORITMO);
+
+			String pwd = string;
+			byte[] clearText = pwd.getBytes();
+			String s1 = new String(clearText);
+			cipher.init(Cipher.ENCRYPT_MODE, llave);
+			byte[] cipheredText = cipher.doFinal(clearText);
+			return cipheredText;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+
+	}
 }
