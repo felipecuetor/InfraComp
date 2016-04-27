@@ -41,6 +41,7 @@ import Principal.CifradorAsimetrico;
 import Principal.CifradorSimetrico;
 import Principal.Hash;
 import Principal.Transformacion;
+import uniandes.gload.core.Task;
 
 public class Cliente {
 
@@ -70,7 +71,8 @@ public class Cliente {
 	 * @param socketCliente
 	 *            el socket de comunicacion con el servidor
 	 */
-	public Cliente(Socket socketCliente) {
+	public Cliente(Socket socketCliente) 
+	{
 		this.socket = socketCliente;
 
 		PrivateKeyFactory factory = new PrivateKeyFactory();

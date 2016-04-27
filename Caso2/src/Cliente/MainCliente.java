@@ -13,7 +13,7 @@ public class MainCliente {
 
 		Socket socketCliente = null;
 		try {
-			socketCliente = new Socket("0", 8090);
+			socketCliente = new Socket("172.24.100.42", 9090);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
