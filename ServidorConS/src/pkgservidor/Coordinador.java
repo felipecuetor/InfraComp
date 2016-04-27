@@ -20,7 +20,7 @@ public class Coordinador {
 	private static final String MAESTRO = "MAESTRO: ";
 	static java.security.cert.X509Certificate certSer; /* acceso default */
 	static KeyPair keyPairServidor; /* acceso default */
-	static int MAX=2;
+	static int MAX=16;
 	private int perdidos;
 	private int tiempoTotal;
 	private int tiempoPromedio;
@@ -86,16 +86,17 @@ public class Coordinador {
 		tiempoPromedio=tiempoTotal/cantTiempos;
 		System.out.println("El tiempo promedio de autenticacion es: " + tiempoPromedio);
 		
-		tiempoTotalActua+=tiempo;
+		tiempoTotalActua+=duracionActualizacion;
 		cantTiemposActua++;
 		tiempoPromedioActua=tiempoTotalActua/cantTiemposActua;
-		System.out.println("El tiempo promedio de autenticacion es: " + tiempoPromedioActua);
+		System.out.println("El tiempo promedio de actualizacion es: " + tiempoPromedioActua);
 	}
 
 	public Coordinador()
 	{
 		perdidos = 0;
 		tiempoPromedio = 0;
+		tiempoPromedioActua=0;
 	}
 	
 	public int getTiempoPromedio()

@@ -29,16 +29,15 @@ public class Delegado extends Thread {
 	// Atributos
 	private Socket sc = null;
 	private String dlg;
-	private Coordinador coordinador;
+	private Coordinador coor;
 	
-	Delegado (Socket csP, int idP, Coordinador cordinador) {
+	Delegado (Socket csP, int idP, Coordinador coordinador) {
 		sc = csP;
 		dlg = new String("dlg " + idP + ": ");
-		coordinador = coordinador;
+		this.coor = coordinador;
 	}
 	
 	public void run() {
-		Coordinador coor =new Coordinador();
 		String me = new String(STATUS+SEPARADOR+ERROR);
 		String mok = new String(STATUS+SEPARADOR+OK);
 		String mt;
@@ -177,12 +176,18 @@ public class Delegado extends Thread {
 		        System.out.println(dlg + "Termino exitosamente.");
 		        long duracionActualizacion = System.currentTimeMillis()- tiempoActualizacion;
 		        
-		        coor.recalcularTiempo(duracionAutenticacion,duracionActualizacion);
+		        recalcularTiempo(duracionAutenticacion, duracionActualizacion);
 				
 	        } catch (Exception e) {
 	          e.printStackTrace();
 	          coor.aumentarPerdidos();
 	          
 	        }
+	}
+	
+	public void recalcularTiempo(long duracionAutenticacion, long duracionActualizacion)
+	{
+		coor.recalcularTiempo(duracionAutenticacion,duracionActualizacion);
+		
 	}
 }
