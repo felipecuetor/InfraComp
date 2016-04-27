@@ -10,6 +10,10 @@ import java.security.Security;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Clase servidor con seguridad
+ *
+ */
 public class Coordinador {
 
 	private static ServerSocket ss;	
