@@ -16,7 +16,11 @@ public class Coordinador {
 	private static final String MAESTRO = "MAESTRO: ";
 	static java.security.cert.X509Certificate certSer; /* acceso default */
 	static KeyPair keyPairServidor; /* acceso default */
-	static int MAX=5;
+	static int MAX=2;
+	private int perdidos;
+	private int tiempoTotal;
+	private int tiempoPromedio;
+	private int cantTiempos;
 	
 	/**
 	 * @param args
@@ -24,6 +28,8 @@ public class Coordinador {
 	public static void main(String[] args) throws Exception{
 		// TODO Auto-generated method stub
 
+		Coordinador coor = new Coordinador();
+		
 		System.out.println(MAESTRO + "Establezca puerto de conexion:");
 		InputStreamReader isr = new InputStreamReader(System.in);
 		BufferedReader br = new BufferedReader(isr);
@@ -42,22 +48,51 @@ public class Coordinador {
 		certSer = S.gc(keyPairServidor);
 		
 		ExecutorService fixedPool = Executors.newFixedThreadPool(MAX);
-		
 		while (true) {
 			try { 
 				// Crea un delegado por cliente. Atiende por conexion.
 				System.out.println("Esperando");
 				Socket sc = ss.accept();
 				System.out.println(MAESTRO + "Cliente " + idThread + " aceptado.");
-				Delegado d = new Delegado(sc,idThread);
+				Delegado d = new Delegado(sc,idThread, coor);
 				idThread++;
 				fixedPool.submit(d);
-				
-//				d.start();
 			} catch (IOException e) {
 				System.out.println(MAESTRO + "Error creando el socket cliente.");
 				e.printStackTrace();
+				coor.aumentarPerdidos();
+				
 			}
 		}
+		
+	}
+	
+	private void aumentarPerdidos() {
+		perdidos++;
+		System.out.println("La cantidad de objetos perdidos son: "+ perdidos);
+	}
+	
+	public void recalcularTiempo(long tiempo)
+	{
+		tiempoTotal+=tiempo;
+		cantTiempos++;
+		tiempoPromedio=tiempoTotal/cantTiempos;
+		System.out.println("El tiempo promedio es: " + tiempoPromedio);
+	}
+
+	public Coordinador()
+	{
+		perdidos = 0;
+		tiempoPromedio = 0;
+	}
+	
+	public int getTiempoPromedio()
+	{
+		return tiempoPromedio;
+	}
+	
+	public int getPerdidos()
+	{
+		return perdidos;
 	}
 }

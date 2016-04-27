@@ -29,10 +29,12 @@ public class Delegado extends Thread {
 	// Atributos
 	private Socket sc = null;
 	private String dlg;
+	private Coordinador coordinador;
 	
-	Delegado (Socket csP, int idP) {
+	Delegado (Socket csP, int idP, Coordinador cordinador) {
 		sc = csP;
 		dlg = new String("dlg " + idP + ": ");
+		coordinador = coordinador;
 	}
 	
 	public void run() {
@@ -86,6 +88,7 @@ public class Delegado extends Thread {
 				ac.println(mok);
 
 				/***** Fase 3: Recibe certificado del cliente *****/
+				long tiempoAutenticacion = System.currentTimeMillis();
 				linea = dc.readLine();
 				mt = new String(CERCLNT + SEPARADOR);
 				if (!(linea.equals(mt))) {
@@ -120,7 +123,9 @@ public class Delegado extends Thread {
 					throw new Exception(dlg + ERRORPRT + REC + linea + "-terminando.");
 				}
 				System.out.println(dlg + "recibio-" + linea + "-continuando.");
-
+				long duracion = System.currentTimeMillis()- tiempoAutenticacion;
+				new Coordinador().recalcularTiempo(duracion);
+				
 				/***** Fase 5: Envia llave simetrica *****/
 				SecretKey simetrica = S.kgg(algoritmos[1]);
 				byte [ ] ciphertext1 = S.ae(simetrica.getEncoded(), 
