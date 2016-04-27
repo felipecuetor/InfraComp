@@ -38,6 +38,7 @@ public class Delegado extends Thread {
 	}
 	
 	public void run() {
+		Coordinador coor =new Coordinador();
 		String me = new String(STATUS+SEPARADOR+ERROR);
 		String mok = new String(STATUS+SEPARADOR+OK);
 		String mt;
@@ -45,6 +46,7 @@ public class Delegado extends Thread {
 	    System.out.println(dlg + "Empezando atencion.");
 	        try {
 
+	        	
 				PrintWriter ac = new PrintWriter(sc.getOutputStream() , true);
 				BufferedReader dc = new BufferedReader(new InputStreamReader(sc.getInputStream()));
 
@@ -123,8 +125,8 @@ public class Delegado extends Thread {
 					throw new Exception(dlg + ERRORPRT + REC + linea + "-terminando.");
 				}
 				System.out.println(dlg + "recibio-" + linea + "-continuando.");
-				long duracion = System.currentTimeMillis()- tiempoAutenticacion;
-				new Coordinador().recalcularTiempo(duracion);
+				long duracionAutenticacion = System.currentTimeMillis()- tiempoAutenticacion;
+				
 				
 				/***** Fase 5: Envia llave simetrica *****/
 				SecretKey simetrica = S.kgg(algoritmos[1]);
@@ -144,6 +146,7 @@ public class Delegado extends Thread {
 				ac.println(mok);
 				
 				/***** Fase 7: Actualizacion del agente *****/
+				long tiempoActualizacion = System.currentTimeMillis();
 				linea = dc.readLine();
 				if (!(linea.contains(SEPARADOR) && linea.split(SEPARADOR)[0].equals("ACT1"))) {
 					ac.println(me);
@@ -172,9 +175,14 @@ public class Delegado extends Thread {
 				}
 		        sc.close();
 		        System.out.println(dlg + "Termino exitosamente.");
+		        long duracionActualizacion = System.currentTimeMillis()- tiempoActualizacion;
+		        
+		        coor.recalcularTiempo(duracionAutenticacion,duracionActualizacion);
 				
 	        } catch (Exception e) {
 	          e.printStackTrace();
+	          coor.aumentarPerdidos();
+	          
 	        }
 	}
 }

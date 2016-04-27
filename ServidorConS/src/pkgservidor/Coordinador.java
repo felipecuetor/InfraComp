@@ -25,6 +25,9 @@ public class Coordinador {
 	private int tiempoTotal;
 	private int tiempoPromedio;
 	private int cantTiempos;
+	private long tiempoTotalActua;
+	private int cantTiemposActua;
+	private long tiempoPromedioActua;
 	
 	/**
 	 * @param args
@@ -71,17 +74,22 @@ public class Coordinador {
 		
 	}
 	
-	private void aumentarPerdidos() {
+	public void aumentarPerdidos() {
 		perdidos++;
 		System.out.println("La cantidad de objetos perdidos son: "+ perdidos);
 	}
 	
-	public void recalcularTiempo(long tiempo)
+	public void recalcularTiempo(long tiempo, long duracionActualizacion)
 	{
 		tiempoTotal+=tiempo;
 		cantTiempos++;
 		tiempoPromedio=tiempoTotal/cantTiempos;
-		System.out.println("El tiempo promedio es: " + tiempoPromedio);
+		System.out.println("El tiempo promedio de autenticacion es: " + tiempoPromedio);
+		
+		tiempoTotalActua+=tiempo;
+		cantTiemposActua++;
+		tiempoPromedioActua=tiempoTotalActua/cantTiemposActua;
+		System.out.println("El tiempo promedio de autenticacion es: " + tiempoPromedioActua);
 	}
 
 	public Coordinador()
